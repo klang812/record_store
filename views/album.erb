@@ -1,3 +1,4 @@
+<% if @album != nil %>
 <h4>Album Name: <%= @album.name %></h4>
 
 <h3>Album Songs</h3>
@@ -21,6 +22,10 @@
   </div>
   <button type="submit" class="btn">Add song</button>
 </form>
-
 <p><a href="/albums/<%= @album.id %>/edit">Edit album</a></p>
+<% else %>
+  <p>Sorry, this album does not exist</p>
+<% end %>
+
+
 <a href="/albums">Return to album list</a>

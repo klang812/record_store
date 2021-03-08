@@ -1,41 +1,60 @@
 class Album
-  attr_reader :id, :name #Our new save method will need reader methods.
+  attr_reader :id
+  attr_accessor :name 
 
-  @@albums = {}
-  @@total_rows = 0 # We've added a class variable to keep track of total rows and increment the value when an Album is added.
-
-  def initialize(name, id) # We've added id as a second parameter.
-    @name = name
-    @id = id || @@total_rows += 1  # We've added code to handle the id.
+  def initialize(attributes) 
+    @name = attributes.fetch(:name)
+    @id = attributes.fetch(:id)
   end
 
   def self.all
-    @@albums.values()
+    returned_albums = DB.exec("SELECT * FROM albums;")
+    albums = []
+    returned_albums.each() do |album|
+      name = album.fetch("name")
+      id = album.fetch("id").to_i
+      albums.push(Album.new({:name => name, :id => id}))
+    end
+    albums 
   end
 
   def save
-    @@albums[self.id] = Album.new(self.name, self.id)
+    result = DB.exec("INSERT INTO albums (name) VALUES ('#{@name}') RETURNING id;")
+    @id = result.first().fetch("id").to_i
   end
 
   def ==(album_to_compare)
-    self.name() == album_to_compare.name()
+    if album_to_compare != nil
+      self.name() == album_to_compare.name()
+    else
+      nil
+    end
   end
+  
 
   def self.clear
-    @@albums = {}
-    @@total_rows = 0
+    DB.exec("DELETE FROM albums *;")
   end
 
   def self.find(id)
-    @@albums[id]
+    album = DB.exec("SELECT * FROM albums WHERE id = #{id};").first
+    if album != nil
+    name = album.fetch("name")
+    id = album.fetch("id").to_i
+    Album.new({:name => name, :id => id})
+    else
+      nil
+    end
   end
 
   def update(name)
     @name = name
+    DB.exec("UPDATE albums SET name = '#{@name}' WHERE id = #{@id};")
   end
   
   def delete
-    @@albums.delete(self.id)
+    DB.exec("DELETE FROM albums WHERE id = #{@id};")
+    DB.exec("DELETE FROM songs WHERE album_id = #{@id};")
   end
 
   def songs
