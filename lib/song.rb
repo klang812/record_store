@@ -3,9 +3,9 @@ class Song
   attr_accessor :name, :album_id
 
   def initialize(attributes)
-    @name = attributes.fetch(:name)
-    @album_id = attributes.fetch(:album_id)
-    @id = attributes.fetch(:id)
+    @name = attributes[:name]
+    @album_id = attributes[:album_id]
+    @id = attributes[:id]
   end
 
   def ==(song_to_compare)
@@ -45,9 +45,9 @@ class Song
     end
   end
 
-  def update(name, album_id)
-    @name = name
-    @album_id = album_id
+  def update(updates)
+    @name = updates[:name]
+    @album_id = updates[:album_id]
     DB.exec("UPDATE songs SET name = '#{@name}', album_id = #{@album_id} WHERE id = #{@id};")
   end
 

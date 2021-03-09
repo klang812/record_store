@@ -3,8 +3,8 @@ class Album
   attr_accessor :name 
 
   def initialize(attributes) 
-    @name = attributes.fetch(:name)
-    @id = attributes.fetch(:id)
+    @name = attributes[:name]
+    @id = attributes[:id]
   end
 
   def self.all
