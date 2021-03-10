@@ -1,13 +1,13 @@
 require('sinatra')
 require('sinatra/reloader')
-require('./lib/album')
 require('pry')
-require('./lib/song')
 require('pg')
+require('./lib/album')
+require('./lib/song')
+require('./lib/artist')
 also_reload('lib/**/*.rb')
 
 DB = PG.connect({:dbname => "record_store"})
-
 
 get('/') do
   @albums = Album.all()
@@ -64,8 +64,14 @@ end
 # Post a new song. After the song is added, Sinatra will route to the view for the album the song belongs to.
 post('/albums/:id/songs') do
   @album = Album.find(params[:id].to_i())
-  song = Song.new(:name => params[:song_name], :album_id => @album.id, :id => nil)
-  song.save()
+  if params[:artist_name] != nil
+    @artist = Artist.new({name: params[:artist_name], album_id: @album.id})
+    @artist.save()
+  end
+  if params[:song_name] !=nil
+    song = Song.new({name: params[:song_name], album_id: @album.id})
+    song.save()
+  end
   erb(:album)
 end
 
@@ -85,17 +91,16 @@ delete('/albums/:id/songs/:song_id') do
   erb(:album)
 end
 
-get(/artists) do
+get('/artists') do
   @artists = Artist.all()
   erb(:artists)
 end
 
-get(/artists/:id) do
-  @artist = Artist.find(params[:id].to_i()))
-  erb(:artist)
+get('/artists/new') do
+  erb(:new_artist)
 end
 
-post(/artists) do
+post('/artists') do
   name = params[:artist_name]
   artist = Artist.new({name: name})
   artist.save()
@@ -103,14 +108,19 @@ post(/artists) do
   erb(:artists)
 end
 
-patch(/artists/:id) do
+get('/artists/:id') do
+  @artist = Artist.find(params[:id].to_i())
+  erb(:artist)
+end
+
+patch('/artists/:id') do
   @artist = Artist.find(params[:id].to_i())
   @artist.update(params[:artist_name])
   @artists = Artist.all()
   erb(:artists)
 end
 
-delete(/artists/:id) do
+delete('/artists/:id') do
   @artist = Artist.find(params[:id].to_i())
   @artist.delete()
   @artists = Artist.all()

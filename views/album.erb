@@ -1,5 +1,17 @@
-<% if @album != nil %>
-<h4>Album Name: <%= @album.name %></h4>
+<h2>Album Name: <%= @album.name %></h2>
+
+<% if @artist %>
+    <h4>Artist Name: <%= @artist.name %></h4>
+  <% else %>
+    <h4>Add an artist:</h4>
+    <form id="add-artist" action="/albums/<%= @album.id %>/songs" method="post">
+      <div class="form-group">
+        <label for="artist_name">Artist name</label>
+        <input id="artist_name" name="artist_name" class="form-control" type="text" required>
+      </div>
+      <button form="add-artist" type="submit" class="btn">Add artist</button>
+    </form>    
+  <% end %>
 
 <h3>Album Songs</h3>
 
@@ -15,17 +27,15 @@
 
 <h4>Add a song:</h4>
 
-<form action="/albums/<%= @album.id %>/songs" method="post">
+<form id="add-song" action="/albums/<%= @album.id %>/songs" method="post">
   <div class="form-group">
     <label for="song_name">Song name</label>
-    <input id="song_name" name="song_name" class="form-control" type="text">
+    <input id="song_name" name="song_name" class="form-control" type="text" required>
   </div>
-  <button type="submit" class="btn">Add song</button>
+  <button form="add-song" type="submit" class="btn">Add song</button>
 </form>
+
+
+
 <p><a href="/albums/<%= @album.id %>/edit">Edit album</a></p>
-<% else %>
-  <p>Sorry, this album does not exist</p>
-<% end %>
-
-
-<a href="/albums">Return to album list</a>
+<p><a href="/albums">Return to album list</a></p>
